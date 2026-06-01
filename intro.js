@@ -1,10 +1,13 @@
 window.onload = function () {
     const canvas = document.getElementById("canvas");
     const ctx = canvas.getContext("2d");
+    const nameButton = document.getElementById("nameButton");
+    const emailField = document.getElementById("emailField");
+    const emailInput = document.getElementById("emailInput");
 
-    const particleSize = 1;
-    const particleSpacing = 3;
-    const svgScale = 1;
+    const particleSize = .9;
+    const particleSpacing = 2.8;
+    const svgScale = 1.23;
     const mouseRadius = 70;
     const mouse = {
         x: null,
@@ -26,12 +29,25 @@ window.onload = function () {
         mouse.y = event.y;
     });
 
+    if (nameButton) {
+        nameButton.addEventListener("click", function () {
+            const emailValue = emailInput?.value?.trim() || "";
+            alert(emailValue ? `Starting with: ${emailValue}` : "Please enter your email.");
+        });
+    }
+
+    if (emailField) {
+        emailField.addEventListener("submit", function (event) {
+            event.preventDefault();
+        });
+    }
+
     class Particle {
         constructor(x, y) {
             this.x = Math.random() * canvas.width;
             this.y = Math.random() * canvas.height;
             this.size = particleSize;
-            this.color = "#EB7350";
+            this.color = "#FFFFFF";
             this.baseX = x;
             this.baseY = y;
             this.density = Math.random() * 30 + 1;
@@ -151,11 +167,11 @@ window.onload = function () {
                 height: Number.isFinite(vbHeight) ? vbHeight : 100,
             },
             paths: paths
-            .map((path) => ({
-                d: path.getAttribute("d"),
-                transform: getCombinedTransform(path),
-            }))
-            .filter((entry) => Boolean(entry.d)),
+                .map((path) => ({
+                    d: path.getAttribute("d"),
+                    transform: getCombinedTransform(path),
+                }))
+                .filter((entry) => Boolean(entry.d)),
         };
     }
 
