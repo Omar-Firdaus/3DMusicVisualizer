@@ -8,14 +8,35 @@
     <link rel="stylesheet" href="index.css" />
 </head>
 <body>
-    <main class="indexPage">
-        <h1 class="pageTitle">3D Music Visualizer</h1>
-    </main>
+    <main class="indexPage" aria-hidden="true"></main>
 
     <section class="mixerPanel" id="mixerPanel" aria-label="Track mixer">
-        <button id="mixerToggle" class="mixerToggle" type="button" aria-expanded="false">
-            Mixer Controls
-        </button>
+        <div class="mixerBar">
+            <button id="mixerToggle" class="mixerToggle" type="button" aria-expanded="false">
+                Mixer Controls
+            </button>
+            <button id="transportPlay" class="transportPlay" type="button" aria-pressed="false">
+                Play
+            </button>
+        </div>
+
+        <div class="transportStrip">
+            <div class="transportTimes">
+                <span id="transportElapsed">0:00</span>
+                <span class="transportDivider">/</span>
+                <span id="transportDuration">0:00</span>
+            </div>
+            <input
+                id="transportSeek"
+                class="transportSeek"
+                type="range"
+                min="0"
+                max="1000"
+                value="0"
+                step="1"
+                disabled
+            />
+        </div>
 
         <div class="mixerContent">
             <div class="trackGrid" id="trackGrid"></div>

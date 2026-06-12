@@ -14,7 +14,7 @@ There's a couple things I want in this project, but here are some of the negotia
 
 - Avoid using off the shelf tracks and visuals. This one is self expalantory, build form the ground up.
 
-- Give the user the opportuntiy to tinker with the track's eq, fx, and whatever else I think might be a good fit for th visualizer
+- Give the user the opportuntiy to tinker with the track's eq, fx, and whatever else I think might be a good fit for the visualizer. This is going to be done through fader knobs of some sort, so I can replciate that feeling of physical hardware.
 
 - Also a feedback form. Being able to take advice staright from the site would be pretty sweet.
 

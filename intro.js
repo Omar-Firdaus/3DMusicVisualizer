@@ -15,6 +15,8 @@ window.onload = function () {
         radius: mouseRadius,
     };
 
+    const MAIN_SITE_URL = "index.HTML";
+
     let particlesArray = [];
 
     function setCanvasSize() {
@@ -29,16 +31,17 @@ window.onload = function () {
         mouse.y = event.y;
     });
 
-    if (nameButton) {
-        nameButton.addEventListener("click", function () {
-            const emailValue = emailInput?.value?.trim() || "";
-            alert(emailValue ? `Starting with: ${emailValue}` : "Please enter your email.");
-        });
-    }
-
+    
     if (emailField) {
         emailField.addEventListener("submit", function (event) {
             event.preventDefault();
+
+            const emailValue = emailInput?.value?.trim() || "";
+            if (!emailValue) {
+                alert("Please enter something to continue.");
+                return;
+            }
+            window.location.href = MAIN_SITE_URL;
         });
     }
 

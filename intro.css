@@ -1,6 +1,8 @@
+html,
 body {
+    min-height: 100%;
     margin: 0;
-    background-color: #161616;
+    background: linear-gradient(180deg, #0a1f3d 0%, #143960 55%, #264b7e 100%);
 }
 .page {
     min-height: 100vh;
@@ -24,7 +26,7 @@ canvas {
     align-items: stretch;
     border: 1px solid rgba(255, 255, 255, 0.75);
     border-radius: 0;
-    background: #161616;
+    background: #143960;
     position: fixed;
     top: 63vh;
     left: 50%;
