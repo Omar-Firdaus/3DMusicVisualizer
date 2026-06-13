@@ -1,6 +1,7 @@
 3D Music Visualizer
 
 Bug notice: Working on figuring out why my label reassignemtns aren't working for sounds, but until then there's jsut generic insturment headers for the mixer.
+
 Explanation of why I'm building the project:
 
 Over the past few months I've been getting more and more into music production. A lot of this production is done in software that's not very good at visualizing the experience of listenting to music. Because of that, I wanted to create a visual experience that goes beyond the waveforms in Logic Pro, and creates some sort of visually stunning experience. I also want to take advantage of the opportunity to showcase the music I'm working on, so for the project I'm going to be building at least 1 entire new song. Because the visuals are about my new music, I also want to make it something that demonstrates the goal of my music's design.
