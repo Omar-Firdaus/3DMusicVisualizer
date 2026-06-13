@@ -26,7 +26,7 @@ Just go to the link to start the project. Pause, play, and loop controls are pre
 
 AI Usage:
 
-On some of the js effects I had cursor help me on the animations + I've never worked with wave files before this so it was helpful having AI help me work through my issues on that side of things. Also, I hate commiting to github by hand so I just went ahead and had cursor do that for me.
+On some of the js effects I had cursor help me on the animations + I've never worked with wave files before this so it was helpful having AI help me work through my issues on that side of things. Also, I'm lazy and hate comitting so half the time I'll have the agent commit for me.
 
 Acknowledgements:
 
