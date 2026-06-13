@@ -16,10 +16,18 @@ There's a couple things I want in this project, but here are some of the negotia
 
 - Give the user the opportuntiy to tinker with the track's eq, fx, and whatever else I think might be a good fit for the visualizer. This is going to be done through fader knobs of some sort, so I can replciate that feeling of physical hardware.
 
-- Also a feedback form. Being able to take advice staright from the site would be pretty sweet.
+Stack:
+
+Vanilla html, css, and js. Three.js for the cool 3D effects on intro and visualizer. 
 
 Usage:
 
-Just go to the link to start the project. Pause, play, and loop controls are pretty self explanatory. Expiriment with adding and adjusting EQ & FX, along with muting or increasign the volume of certain tracks. 
+Just go to the link to start the project. Pause, play, and loop controls are pretty self explanatory. The graphics on the main page are reactive to the song. I encourage you to play around with the different effects, and see how they impact both the music and visualizations.
 
+AI Usage:
 
+On some of the js effects I had cursor help me on the animations + I've never worked with wave files before this so it was helpful having AI help me work through my issues on that side of things.
+
+Acknowledgements:
+
+Shoutout robot bobby for helping me learn 3js visualization setup

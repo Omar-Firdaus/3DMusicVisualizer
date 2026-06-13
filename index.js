@@ -34,6 +34,8 @@ window.addEventListener("DOMContentLoaded", function () {
 
     let audioContext = null;
     let masterGain = null;
+    let masterAnalyser = null;
+    let masterFreqData = null;
     let masterFilters = null;
     const trackChannels = [];
     let isPlaying = false;
@@ -141,6 +143,11 @@ window.addEventListener("DOMContentLoaded", function () {
             masterGain = audioContext.createGain();
             masterGain.gain.value = 1;
 
+            masterAnalyser = audioContext.createAnalyser();
+            masterAnalyser.fftSize = 512;
+            masterAnalyser.smoothingTimeConstant = 0.82;
+            masterFreqData = new Uint8Array(masterAnalyser.frequencyBinCount);
+
             masterFilters = EQ_BANDS.map(function (band) {
                 const filter = audioContext.createBiquadFilter();
                 filter.type = band.type;
@@ -152,7 +159,9 @@ window.addEventListener("DOMContentLoaded", function () {
                 return filter;
             });
 
-            let chainEnd = masterGain;
+            masterGain.connect(masterAnalyser);
+
+            let chainEnd = masterAnalyser;
             for (let i = 0; i < masterFilters.length; i += 1) {
                 chainEnd.connect(masterFilters[i]);
                 chainEnd = masterFilters[i];
@@ -238,6 +247,9 @@ window.addEventListener("DOMContentLoaded", function () {
             gainNode: null,
             filters: null,
             filterHead: null,
+            analyser: null,
+            levelData: null,
+            channelEl: channel,
             loadStatus: track.file ? "idle" : "none",
             loadError: null,
             duration: 0,
@@ -324,12 +336,128 @@ window.addEventListener("DOMContentLoaded", function () {
     function buildTrackChain(trackState, initialFaderValue) {
         const filters = createTrackFilters();
         const gainNode = audioContext.createGain();
+        const analyser = audioContext.createAnalyser();
+
+        analyser.fftSize = 256;
+        analyser.smoothingTimeConstant = 0.75;
+
         gainNode.gain.value = faderToGain(initialFaderValue);
         const filterHead = connectFilterChain(filters, gainNode);
-        gainNode.connect(masterGain);
+        gainNode.connect(analyser);
+        analyser.connect(masterGain);
+
         trackState.filters = filters;
         trackState.gainNode = gainNode;
         trackState.filterHead = filterHead;
+        trackState.analyser = analyser;
+        trackState.levelData = new Uint8Array(analyser.frequencyBinCount);
+    }
+
+    function getTrackLevel(trackState) {
+        if (!trackState.analyser || !trackState.levelData || !trackState.source) {
+            return 0;
+        }
+
+        trackState.analyser.getByteTimeDomainData(trackState.levelData);
+
+        let sum = 0;
+        for (let i = 0; i < trackState.levelData.length; i += 1) {
+            const sample = (trackState.levelData[i] - 128) / 128;
+            sum += sample * sample;
+        }
+
+        const rms = Math.sqrt(sum / trackState.levelData.length);
+        return clamp(rms * 2.8, 0, 1);
+    }
+
+    function updateChannelLevels() {
+        trackChannels.forEach(function (trackState) {
+            if (!trackState.channelEl) {
+                return;
+            }
+
+            if (!isPlaying) {
+                trackState.channelEl.style.setProperty("--channel-level", "0");
+                trackState.channelEl.classList.add("is-idle");
+                trackState.channelEl.classList.remove("is-playing");
+                return;
+            }
+
+            const level = getTrackLevel(trackState);
+            trackState.channelEl.style.setProperty("--channel-level", String(level));
+            trackState.channelEl.classList.toggle("is-playing", level > 0.02);
+            trackState.channelEl.classList.toggle("is-idle", level <= 0.02);
+        });
+    }
+
+    function refreshMasterFreq() {
+        if (!masterAnalyser || !masterFreqData) {
+            return false;
+        }
+
+        masterAnalyser.getByteFrequencyData(masterFreqData);
+        return true;
+    }
+
+    function getMasterAudioSnapshot() {
+        if (!refreshMasterFreq()) {
+            return { level: 0, bass: 0, mid: 0, high: 0 };
+        }
+
+        const binCount = masterFreqData.length;
+        let total = 0;
+        let bass = 0;
+        let mid = 0;
+        let high = 0;
+
+        for (let i = 0; i < binCount; i += 1) {
+            const sample = masterFreqData[i] / 255;
+            total += sample;
+
+            if (i < 8) {
+                bass += sample;
+            } else if (i < 40) {
+                mid += sample;
+            } else {
+                high += sample;
+            }
+        }
+
+        const level = clamp((total / binCount) * 2.4, 0, 1);
+        return {
+            level: level,
+            bass: clamp((bass / 8) * 2.2, 0, 1),
+            mid: clamp((mid / 32) * 2.0, 0, 1),
+            high: clamp((high / Math.max(1, binCount - 40)) * 2.6, 0, 1),
+        };
+    }
+
+    window.submarineAudio = {
+        isPlaying: function () {
+            return isPlaying;
+        },
+        getSnapshot: getMasterAudioSnapshot,
+        getFrequencyData: function () {
+            if (!refreshMasterFreq()) {
+                return null;
+            }
+            return masterFreqData;
+        },
+        getBinCount: function () {
+            return masterFreqData ? masterFreqData.length : 0;
+        },
+    };
+
+    function resetChannelLevels() {
+        trackChannels.forEach(function (trackState) {
+            if (!trackState.channelEl) {
+                return;
+            }
+
+            trackState.channelEl.style.setProperty("--channel-level", "0");
+            trackState.channelEl.classList.remove("is-playing");
+            trackState.channelEl.classList.add("is-idle");
+        });
     }
 
     async function setupTrackAudio(trackState, initialFaderValue) {
@@ -370,7 +498,6 @@ window.addEventListener("DOMContentLoaded", function () {
         try {
             trackState.source.stop();
         } catch (error) {
-            // Source may already be stopped.
         }
         trackState.source.disconnect();
         trackState.source = null;
@@ -440,6 +567,7 @@ window.addEventListener("DOMContentLoaded", function () {
         isPlaying = false;
         wantsToPlay = false;
         setTransportLabel(false);
+        resetChannelLevels();
     }
 
     async function ensureTracksLoaded() {
@@ -586,6 +714,8 @@ window.addEventListener("DOMContentLoaded", function () {
         if (isPlaying && !isScrubbing) {
             updateTransportUI(getCurrentPlaybackTime());
         }
+        updateChannelLevels();
+
         requestAnimationFrame(tickTransport);
     }
 
@@ -604,5 +734,6 @@ window.addEventListener("DOMContentLoaded", function () {
         });
     });
 
+    resetChannelLevels();
     tickTransport();
 });
