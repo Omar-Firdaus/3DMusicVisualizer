@@ -1,0 +1,6 @@
+{
+  "rewrites": [
+    { "source": "/intro.HTML", "destination": "/index.html" },
+    { "source": "/index.HTML", "destination": "/mixer.html" }
+  ]
+}

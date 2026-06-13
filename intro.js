@@ -15,7 +15,7 @@ window.onload = function () {
         radius: mouseRadius,
     };
 
-    const MAIN_SITE_URL = "index.HTML";
+    const MAIN_SITE_URL = "mixer.html";
 
     let particlesArray = [];
 
